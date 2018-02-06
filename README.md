@@ -5,6 +5,8 @@ This repository describes nodes used to facilitate workshops and demos for mesh 
 
 The scripts to generate unique configurations for each node is contained in this repository. Creation of the nodes is fast and trivial, and only needs to be done once, since the nodes do not persist any runtime state. User sessions are run off a ramdisk (and a swap memory-backed filesystem) such that all runtime states are lost across power cycles.
 
+Once the nodes are prepared, no Internet connection is necessary to run this workshop (unless you want to run docker containers). All the software is pre-installed and the peer-to-peer network operates without the need for a central server or Internet connectivity.
+
 
 Hardware
 --------
@@ -29,7 +31,7 @@ You need a recent release of [mesh-orange](https://github.com/tomeshnet/mesh-ora
 
 Now you can clone this repository and run `./build` to generate 40 unique host configurations under `output/`. Simply flash the downloaded image onto an SD card, mount its FAT partition to your computer, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root. For example, on Mac OS:
 
-	$ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
+	$ cp output/conf.d/bloor/* /Volumes/BOOT/conf.d/
 
 Now you have configured the node with hostname `bloor`.
 
