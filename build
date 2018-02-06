@@ -15,7 +15,7 @@ for hostname in "${HOSTNAMES[@]}"; do
 
   # Create 20-sample.tar.gz that will be extracted into /etc
   cp -r src/etc/* output/etc/$hostname/
-  find output/etc/$hostname -type f -exec sed -i "s/__HOSTNAME__/$hostname/g" {} +
+  find output/etc/$hostname -type f -exec gawk -i inplace "{ gsub(/__HOSTNAME__/, \"$hostname\") }; { print }" {} +
   tar --create --gzip -f output/conf.d/$hostname/20-sample.tar.gz -C output/etc/$hostname .
 
   # Copy sh scripts
