@@ -13,10 +13,10 @@ rm -rf output
 for hostname in "${HOSTNAMES[@]}"; do
   mkdir -p output/conf.d/$hostname output/etc/$hostname
 
-  # Create 20-sample.tar.gz that will be extracted into /etc
+  # Create 30-mesh-workshop.tar.gz that will be extracted into /etc
   cp -r src/etc/* output/etc/$hostname/
   find output/etc/$hostname -type f -exec gawk -i inplace "{ gsub(/__HOSTNAME__/, \"$hostname\") }; { print }" {} +
-  tar --create --gzip -f output/conf.d/$hostname/20-sample.tar.gz -C output/etc/$hostname .
+  tar --create --gzip -f output/conf.d/$hostname/30-mesh-workshop.tar.gz -C output/etc/$hostname .
 
   # Copy sh scripts
   cp src/sh/* output/conf.d/$hostname/

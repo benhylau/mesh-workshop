@@ -27,9 +27,9 @@ Software
 
 You need a recent release of [mesh-orange](https://github.com/tomeshnet/mesh-orange) built using [mesh-router-builder](https://github.com/benhylau/mesh-router-builder), where the [cjdns](https://github.com/cjdelisle/cjdns) and [yggdrasil](https://github.com/Arceliar/yggdrasil-go/) mesh routers are pre-installed along with other tools required for this workshop. You can [download from here](https://github.com/benhylau/mesh-router-builder/releases) a recent `raspberrypi3-<version>.img`.
 
-Now you can clone this repository and run `./build` to generate 40 unique host configurations under `output/`. Simply flash the downloaded image onto an SD card, mount its FAT partition to your computer, then copy from `output/<hostname>/conf.d/*` to the `conf.d/` on the SD card root. For example, on Mac OS:
+Now you can clone this repository and run `./build` to generate 40 unique host configurations under `output/`. Simply flash the downloaded image onto an SD card, mount its FAT partition to your computer, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root. For example, on Mac OS:
 
-	$ cp -r output/bloor/conf.d/* /Volumes/BOOT/conf.d/
+	$ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
 
 Now you have configured the node with hostname `bloor`.
 
