@@ -68,26 +68,27 @@ You can list all the network interfaces with `networkctl`:
 	  1 lo               loopback           carrier     unmanaged
 	  2 eth0             ether              no-carrier  configuring
 	  3 wlan0            wlan               routable    configured
-	  4 wlan1            wlan               routable    configured
-	  5 tun0             none               routable    unmanaged
+	  4 tun0             none               routable    unmanaged
+	  5 wlan1            wlan               routable    configured
 	  6 tun1             none               routable    unmanaged
+	  7 docker0          ether              no-carrier  unmanaged
 
-	6 links listed.
+	7 links listed.
 
 Then use `networkctl status` to see their assigned IP addresses:
 
 	root@bloor:~# networkctl status
 	●        State: routable
-	       Address: 10.0.0.1 on wlan0
-	                10.0.1.1 on wlan0
-	                10.0.2.1 on wlan1
+	       Address: 10.0.1.3 on wlan0
+	                10.0.0.1 on wlan1
+	                172.17.0.1 on docker0
+	                169.254.227.187 on wlan0
 	                fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737 on tun0
 	                fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049 on tun1
-	                fe80::ba27:ebff:fec0:6d7e on eth0
-	                fe80::ba27:ebff:fe95:382b on wlan0
-	                fe80::8616:f9ff:fe10:7656 on wlan1
-	                fe80::8ff1:4b:c4df:dde7 on tun0
-	                fe80::22b3:5c97:c621:6de9 on tun1
+	                fe80::8e88:2bff:fe00:e2 on wlan0
+	                fe80::ab48:ab55:de33:5d74 on tun0
+	                fe80::ba27:ebff:fe95:382b on wlan1
+	                fe80::2dfe:b629:409d:e802 on tun1
 
 In this example, cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049` in its `fc00::/8` address space, and yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` address space.
 
@@ -97,37 +98,37 @@ In this example, cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5
 You can use `iw dev` to see the on-board WiFi radio in `AP` mode on `channel 11` and the USB WiFi radio in `mesh point` mode on `channel 1` taking up `40 MHz`:
 
 	root@bloor:~# iw dev
-	phy#0
-	        Interface wlan1
-	                ifindex 4
-	                wdev 0x1
-	                addr 84:16:f9:10:76:56
-	                type mesh point
-	                channel 1 (2412 MHz), width: 40 MHz, center1: 2422 MHz
-	                txpower 20.00 dBm
 	phy#1
-	        Interface wlan0
-	                ifindex 3
+	        Interface wlan1
+	                ifindex 5
 	                wdev 0x100000001
 	                addr b8:27:eb:95:38:2b
 	                ssid bloor
 	                type AP
 	                channel 11 (2462 MHz), width: 20 MHz, center1: 2462 MHz
 	                txpower 31.00 dBm
+	phy#0
+	        Interface wlan0
+	                ifindex 3
+	                wdev 0x1
+	                addr 8c:88:2b:00:00:e2
+	                type mesh point
+	                channel 1 (2412 MHz), width: 40 MHz, center1: 2422 MHz
+	                txpower 30.00 dBm
 
 Then you can do a `iw <interface> station dump` to see devices connected to the interface:
 
-	root@bloor:~# iw wlan0 station dump
-	Station b8:e8:56:2b:30:c6 (on wlan0)
+	root@bloor:~# iw wlan1 station dump
+	Station b8:e8:56:2b:30:c6 (on wlan1)
 	        inactive time:  0 ms
-	        rx bytes:       249360
-	        rx packets:     1741
-	        tx bytes:       211093
-	        tx packets:     955
-	        tx failed:      10
-	        signal:         -36 [-36] dBm
+	        rx bytes:       155498
+	        rx packets:     1487
+	        tx bytes:       104580
+	        tx packets:     716
+	        tx failed:      1
+	        signal:         -27 [-27] dBm
 	        tx bitrate:     72.2 MBit/s
-	        rx bitrate:     72.2 MBit/s
+	        rx bitrate:     65.0 MBit/s
 	        authorized:     yes
 	        authenticated:  yes
 	        associated:     yes
@@ -136,7 +137,7 @@ Then you can do a `iw <interface> station dump` to see devices connected to the 
 	        DTIM period:    2
 	        beacon interval:100
 	        short slot time:yes
-	        connected time: 297 seconds
+	        connected time: 301 seconds
 
 In this example, it is showing the radio of my laptop that is connected to the Raspberry Pi's Access Point on `wlan0`.
 
@@ -155,6 +156,9 @@ This will ping the link-local addresses because mDNS advertises those addresses.
 
 Now these pings go through the encrypted `tun1` and `tun0` virtual interfaces, associated with cjdns and yggdrasil, respectively in this example. Note that these addresses are regenerated on power cycle.
 
+Sometimes cjdns does not know that a new peer came up, so if the ping fails you need to restart the process with:
+
+	kill `ps aux | grep -e '^nobody.*cjdroute' | awk '{ print $2 }'`
 
 ### Send test traffic with `iperf3`
 
@@ -171,7 +175,7 @@ You can also test the encrypted interfaces and observe that the bandwidth is low
 	root@college:~# iperf3 -c fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049
 	root@college:~# iperf3 -c fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737
 
-After the test, `bloor` can hit `Ctrl+C` to stop the iperf3 server.
+After the test, `bloor` can hit `Ctrl + C` to stop the iperf3 server.
 
 
 ### Make wired ethernet link and assign route with `ip`
@@ -198,9 +202,11 @@ You are still unable to ping `192.168.0.2` from `192.168.0.1` until you add a ro
 Now you may list your routes with `ip route` and see the new static route:
 
 	root@bloor:~# ip route
-	10.0.0.0/24 dev wlan0 proto kernel scope link src 10.0.0.1
-	10.0.1.0/24 dev wlan0 proto kernel scope link src 10.0.1.1
-	10.0.2.0/24 dev wlan1 proto kernel scope link src 10.0.2.1
+	default dev wlan0 proto static scope link metric 2048
+	10.0.0.0/24 dev wlan1 proto kernel scope link src 10.0.0.1
+	10.0.1.0/24 dev wlan0 proto kernel scope link src 10.0.1.3
+	169.254.0.0/16 dev wlan0 proto kernel scope link src 169.254.227.187
+	172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
 	192.168.0.0/24 via 192.168.0.1 dev eth0
 
 Similarly on `college`, add route and ping:
@@ -237,6 +243,6 @@ It is not a concern that we will run out of ramdisk space, because 6 GB of the S
 
 	root@bloor:~# df -t rootfs -h
 	Filesystem      Size  Used Avail Use% Mounted on
-	rootfs          5.8G  243M  5.5G   5% /
+	rootfs          5.8G  350M  5.4G   6% /
 
 See? We have plenty of space. The backing partition is mounted as swap memory so state is not retained after power cycle.

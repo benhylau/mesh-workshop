@@ -10,12 +10,16 @@ HOSTNAMES=(bathurst bayview bloor broadview chester christie college coxwell dav
 rm -rf output
 
 # Build configurations for each node
+hostno=0
 for hostname in "${HOSTNAMES[@]}"; do
+  ((hostno++))
+  
   mkdir -p output/conf.d/$hostname output/etc/$hostname
 
   # Create 30-mesh-workshop.tar.gz that will be extracted into /etc
   cp -r src/etc/* output/etc/$hostname/
   find output/etc/$hostname -type f -exec gawk -i inplace "{ gsub(/__HOSTNAME__/, \"$hostname\") }; { print }" {} +
+  find output/etc/$hostname -type f -exec gawk -i inplace "{ gsub(/__HOSTNO__/, \"$hostno\") }; { print }" {} +
   tar --create --gzip -f output/conf.d/$hostname/30-mesh-workshop.tar.gz -C output/etc/$hostname .
 
   # Copy sh scripts
