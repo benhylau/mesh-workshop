@@ -229,7 +229,7 @@ You can also iperf3 the two nodes and observe the bandwidth between the two node
 
 ### Run applications with `docker`
 
-The images have `docker` pre-installed, so you just need to get the `Dockerfile` you need and start the container. Unlike other sections, this part requires Internet access and more manual steps. Hopefully we can improve on this in the futre.
+The images have `docker` pre-installed, so you just need to get the `Dockerfile` you need and start the container. Unlike other sections, this part requires Internet access and more manual steps. Hopefully we can improve on this in the future.
 
 It is not a concern that we will run out of ramdisk space, because 6 GB of the SD card is used to back the in-memory filesystem:
 
