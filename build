@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Build unique host configurations for mesh-orange nodes
+#
+
+# Define list of 40 unique hostnames
+HOSTNAMES=(bathurst bayview bloor broadview chester christie college coxwell davisville donlands dufferin dundas dupont eglinton ellesmere finch greenwood islington jane keele kennedy king kipling lawrence leslie midland museum osgoode ossington pape queen rosedale runnymede spadina summerhill union warden wilson woodbine yorkdale)
+
+# Remove built artifacts
+rm -rf output
+
+# Build configurations for each node
+for hostname in "${HOSTNAMES[@]}"; do
+  mkdir -p output/conf.d/$hostname output/etc/$hostname
+
+  # Create 20-sample.tar.gz that will be extracted into /etc
+  cp -r src/etc/* output/etc/$hostname/
+  find output/etc/$hostname -type f -exec sed -i "s/__HOSTNAME__/$hostname/g" {} +
+  tar --create --gzip -f output/conf.d/$hostname/20-sample.tar.gz -C output/etc/$hostname .
+
+  # Copy sh scripts
+  cp src/sh/* output/conf.d/$hostname/
+done
