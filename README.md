@@ -3,7 +3,7 @@ Mesh Workshop
 
 This repository describes nodes used to facilitate workshops and demos for mesh networking. The nodes boot with multiple zero-configuration technologies such as mDNS and self-addressing auto-peering mesh protocols to eliminate initial set up time. An autonomous network is formed upon power-on and nodes can address each other over `<hostname>.local` addresses.
 
-The scripts to generation unique configurations for each node is contained in this repository. Creation of the nodes is fast and trivial, and only needs to be done once, since the nodes do not persist any runtime state. User sessions are run off a ramdisk (and a swap memory-backed disk) such that all runtime states are lost across power cycles.
+The scripts to generate unique configurations for each node is contained in this repository. Creation of the nodes is fast and trivial, and only needs to be done once, since the nodes do not persist any runtime state. User sessions are run off a ramdisk (and a swap memory-backed filesystem) such that all runtime states are lost across power cycles.
 
 
 Hardware
@@ -13,7 +13,7 @@ Each node consists of one:
 
 * Raspberry Pi 3
 * [USB WiFi adapter](https://github.com/phillymesh/802.11s-adapters/blob/master/README.md) with `ath9k_htc`, `rt2800usb`, or `rtl8192cu` driver
-* SD card with 8 GB or more
+* SD card with 8 GB or more space
 
 Other accessories:
 
@@ -39,7 +39,7 @@ What does it do?
 
 ### Connect to Access Point
 
-The Raspberry Pi 3 on-board WiFi radio is configured as an Access Point with:
+The Raspberry Pi's 3 on-board WiFi radio is configured as an Access Point with:
 
 	SSID:       <hostname>
 	Password:   password
@@ -87,7 +87,7 @@ Then use `networkctl status` to see their assigned IP addresses:
 	                fe80::8ff1:4b:c4df:dde7 on tun0
 	                fe80::22b3:5c97:c621:6de9 on tun1
 
-In this example, cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049` in its `fc00::/8` space, and yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` space.
+In this example, cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049` in its `fc00::/8` address space, and yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` address space.
 
 
 ### Observe wireless interfaces with `iw`
@@ -146,7 +146,7 @@ Ping another node that is peered over the mesh point interface. For example, to 
 	root@bloor:~# ping college.local
 	root@bloor:~# ping6 college.local
 
-This will ping the link-local addresses because mDNS advertises those addresses. You can also ping the cjdns and yggdrasil addresses. For example, someone can ping `bloor` like this:
+This will ping the link-local addresses because mDNS advertises those addresses. You can also ping the cjdns and yggdrasil addresses. For example, another node can ping `bloor` like this:
 
 	root@college:~# ping6 fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049
 	root@college:~# ping6 fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737
@@ -156,7 +156,7 @@ Now these pings go through the encrypted `tun1` and `tun0` virtual interfaces, a
 
 ### Send test traffic with `iperf3`
 
-To measure network bandwidth, one host needs to run a iperf3 server:
+To measure network bandwidth, one host needs to run an iperf3 server:
 
 	root@bloor:~# iperf3 -s
 
@@ -189,7 +189,7 @@ You will now see `networkctl` show it as `routable`. Now assign `192.168.0.2` to
 
 	root@college:~# ip addr add 192.168.0.2 dev eth0
 
-You are still unable to ping `192.168.0.2` from `192.168.0.1` until you add a route that tells your node to pass a traffic destined for the `192.168.0.0/24` subnet to the `eth0` interface with IP address `192.168.0.1`:
+You are still unable to ping `192.168.0.2` from `192.168.0.1` until you add a route that tells your node to pass traffic destined for the `192.168.0.0/24` subnet to the `eth0` interface with IP address `192.168.0.1`:
 
 	root@bloor:~# ip route add 192.168.0.0/24 via 192.168.0.1
 
@@ -214,12 +214,12 @@ Now you can iperf3 across the new wired link and observe close to 100 Mbps bandw
 Construct the following network topology:
 
     +--------------------+      +--------------------+                +------------------+
-    | bloor              | WiFi | jane with          | ethernet cable | college          |
-    | - wireless adapter +------+ - wireless adapter +================+ - wired ethernet |
-    |                    |      | - wired ethernet   |                |                  |
+    | bloor              | WiFi | jane               |                | college          |
+    | - wireless adapter +------+ - wireless adapter | ethernet cable |                  |
+    |                    |      | - wired ethernet   +================+ - wired ethernet |
     +--------------------+      +--------------------+                +------------------+
 
-You will find that `bloor` and `college` cannot ping each other over the link-local addresses, but they can find a path to each other via `jane` on the cjdns and yggdrasil addresses. For example:
+You will find that `bloor` and `college` cannot ping each other over the link-local addresses, but they can find a path to each other via `jane` on the cjdns and yggdrasil addresses, because they are mesh routers. For example:
 
 	root@college:~# ping6 fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049
 	root@college:~# ping6 fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737
@@ -229,12 +229,12 @@ You can also iperf3 the two nodes and observe the bandwidth between the two node
 
 ### Run applications with `docker`
 
-The images have `docker` pre-installed, so you just need to get the `Dockerfile` you need and start the container. Unlike other sections, this part requires Internet access and requires more manual steps. Hopefully we can improve on this in the futre.
+The images have `docker` pre-installed, so you just need to get the `Dockerfile` you need and start the container. Unlike other sections, this part requires Internet access and more manual steps. Hopefully we can improve on this in the futre.
 
-It is not a concern that we will run out of ramdisk space, because 6 GB of the SD card is used to back filesystem:
+It is not a concern that we will run out of ramdisk space, because 6 GB of the SD card is used to back the in-memory filesystem:
 
 	root@bloor:~# df -t rootfs -h
 	Filesystem      Size  Used Avail Use% Mounted on
 	rootfs          5.8G  243M  5.5G   5% /
 
-The backing partition is mounted as swap memory so state is not retained after power cycle.
+See? We have plenty of space. The backing partition is mounted as swap memory so state is not retained after power cycle.
