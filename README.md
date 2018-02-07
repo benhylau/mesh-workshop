@@ -90,7 +90,10 @@ Then use `networkctl status` to see their assigned IP addresses:
 	                fe80::ba27:ebff:fe95:382b on wlan1
 	                fe80::2dfe:b629:409d:e802 on tun1
 
-In this example, cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049` in its `fc00::/8` address space, and yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` address space.
+In this example, the mesh router:
+
+* cjdns created `tun1` with `fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049` in its `fc00::/8` address space
+* yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` address space
 
 
 ### Observe wireless interfaces with `iw`
@@ -232,7 +235,7 @@ Construct the following network topology:
     |                    |      | - wired ethernet   +================+ - wired ethernet |
     +--------------------+      +--------------------+                +------------------+
 
-You will find that `bloor` and `college` cannot ping each other over the link-local addresses, but they can find a path to each other via `jane` on the cjdns and yggdrasil addresses, because they are mesh routers. For example:
+You will find that `bloor` and `college` cannot ping each other over the link-local addresses, but they can find a path to each other via `jane` on the cjdns and yggdrasil addresses, because these are mesh routers that will relay traffic across multiple hops. For example:
 
 	root@college:~# ping -6 fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049
 	root@college:~# ping -6 fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737
