@@ -154,12 +154,11 @@ In this example, it is showing the radio of my laptop that is connected to the R
 Ping another node that is peered over the mesh point interface. For example, to ping the host `college`, you can do:
 
 	root@bloor:~# ping college.local
-	root@bloor:~# ping -6 -I <mesh point wlan> college.local
 
 This will ping the local addresses advertised by mDNS. You can also ping the cjdns and yggdrasil addresses. For example:
 
-	root@bloor:~# ping -6 -I <cjdns tun> cjdns.college.local
-	root@bloor:~# ping -6 -I <yggdrasil tun> ygg.college.local
+	root@bloor:~# ping -6 cjdns.college.local
+	root@bloor:~# ping -6 ygg.college.local
 
 Or you can ping the IP addresses directly. For example, `college` can ping `bloor` like this:
 
@@ -244,7 +243,7 @@ You will find that `bloor` and `college` cannot ping each other over the link-lo
 	root@college:~# ping -6 fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049
 	root@college:~# ping -6 fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737
 
-You can also iperf3 the two nodes and observe the bandwidth between the two nodes while routing via `jane`.
+You can also iperf3 the two nodes and observe the bandwidth between the two nodes while routing via `jane`. Note that mDNS addresses will not resolve here, because the mDNS requests are not forwarded across network interfaces (i.e. WiFi and wired ethernet).
 
 
 ### Run applications with `docker`
