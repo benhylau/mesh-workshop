@@ -1,7 +1,7 @@
 Mesh Workshop
 =============
 
-[![Generic badge](https://img.shields.io/badge/Workshop_time-1_hour-1f73e0.svg)](https://github.com/benhylau/mesh-workshop)
+[![Generic badge](https://img.shields.io/badge/Workshop_time-2_hours-1f73e0.svg)](https://github.com/benhylau/mesh-workshop)
 [![Generic badge](https://img.shields.io/badge/Martix_chat-%23tomesh:tomesh.net-666666.svg)](https://chat.tomesh.net/#/room/#tomesh:tomesh.net)
 [![Generic badge](https://img.shields.io/badge/IRC-freenode%2F%23tomesh-666666.svg)](https://webchat.freenode.net/?channels=tomesh)
 
@@ -43,7 +43,7 @@ Now you have configured the node with hostname `bloor`.
 What does it do?
 ----------------
 
-### Connect to Access Point
+### 1. Connect to Access Point
 
 The Raspberry Pi's 3 on-board WiFi radio is configured as an Access Point with:
 
@@ -54,7 +54,7 @@ The Raspberry Pi's 3 on-board WiFi radio is configured as an Access Point with:
 In the example, you can connect to the SSID `bloor` with password `password`.
 
 
-### Log in to Raspberry Pi over SSH
+### 2. Log in to Raspberry Pi over SSH
 
 Once connected to the Access Point from your computer, you can connect to it with SSH password `root`:
 
@@ -63,7 +63,7 @@ Once connected to the Access Point from your computer, you can connect to it wit
 In the example, this would be `ssh root@bloor.local`. You can also connect to the IP address directly without using mDNS `ssh root@10.0.0.1`.
 
 
-### Investigate network interfaces with `networkctl`
+### 3. Investigate network interfaces with `networkctl`
 
 You can list all the network interfaces with `networkctl`:
 
@@ -100,7 +100,7 @@ In this example, the mesh router:
 * yggdrasil created `tun0` with `fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737` in its `fd00::/8` address space
 
 
-### Observe wireless interfaces with `iw`
+### 4. Observe wireless interfaces with `iw`
 
 You can use `iw dev` to see the on-board WiFi radio in `AP` mode on `channel 11` and the USB WiFi radio in `mesh point` mode on `channel 1` taking up `40 MHz`:
 
@@ -149,7 +149,7 @@ Then you can do a `iw <interface> station dump` to see devices connected to the 
 In this example, it is showing the radio of my laptop that is connected to the Raspberry Pi's Access Point on `wlan0`.
 
 
-### Dial a peer with `ping`
+### 5. Dial a peer with `ping`
 
 Ping another node that is peered over the mesh point interface. For example, to ping the host `college`, you can do:
 
@@ -171,7 +171,7 @@ Sometimes cjdns does not know that a new peer came up, so if the ping fails you 
 
 	kill `ps aux | grep -e '^nobody.*cjdroute' | awk '{ print $2 }'`
 
-### Send test traffic with `iperf3`
+### 6. Send test traffic with `iperf3`
 
 To measure network bandwidth, one host needs to run an iperf3 server:
 
@@ -189,7 +189,30 @@ You can also test the encrypted interfaces and observe that the bandwidth is low
 After the test, `bloor` can hit `Ctrl + C` to stop the iperf3 server.
 
 
-### Make wired ethernet link and assign route with `ip`
+### 7. Send text messages with `nc`
+
+Use `nc` to send plaintext messages to one another, one host can listen on port 80:
+
+	root@bloor:~# nc -l -p 80
+
+If `bloor` is listening, `college` can send a plaintext message with:
+
+	root@college:~# nc bloor.local 80
+
+You can also run a minimal webserver that can respond to HTTP messages sent via `curl`:
+
+	root@bloor:~# while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; echo -e "You have reached $(cat /etc/hostname) on $(date)"; } | nc -l -p 80; done
+
+Then on `college`:
+
+	root@college:~# curl bloor.local
+
+Observe the response from the webserver. When you are ready to move on, `bloor` can stop the webserver with `Ctrl + Z` followed by:
+
+    root@bloor:~# ps aux | grep '[nc] -l -p 80' | awk '{ print $2 }' | xargs -n 1 kill -9
+
+
+### 8. Make wired ethernet link and assign route with `ip`
 
 Connect an ethernet cable between `bloor` and `college`, run `networkctl` on each node and observe that `eth0` now shows up as `degraded`:
 
@@ -228,7 +251,7 @@ Similarly on `college`, add route and ping:
 Now you can iperf3 across the new wired link and observe close to 100 Mbps bandwidth because the Raspberry Pi 3 supports a 10/100 Mbps ethernet interface.
 
 
-### Mesh three nodes using cjdns and yggdrasil
+### 9. Mesh three nodes using cjdns and yggdrasil
 
 Construct the following network topology:
 
@@ -246,7 +269,7 @@ You will find that `bloor` and `college` cannot ping each other over the link-lo
 You can also iperf3 the two nodes and observe the bandwidth between the two nodes while routing via `jane`. Note that mDNS addresses will not resolve here, because the mDNS requests are not forwarded across network interfaces (i.e. WiFi and wired ethernet).
 
 
-### Run applications with `docker`
+### 10. Run applications with `docker`
 
 The system image has `docker-ce` pre-installed, so you just need to prepare a tar archive of a docker image you need, then you can `load` and `run` the docker image without Internet access.
 
