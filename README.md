@@ -248,7 +248,7 @@ You can also iperf3 the two nodes and observe the bandwidth between the two node
 
 ### Run applications with `docker`
 
-The images have `docker` pre-installed, so you just need to get the `Dockerfile` you need and start the container. Unlike other sections, this part requires Internet access and more manual steps. Hopefully we can improve on this in the future.
+The system image has `docker-ce` pre-installed, so you just need to prepare a tar archive of a docker image you need, then you can `load` and `run` the docker image without Internet access.
 
 It is not a concern that we will run out of ramdisk space, because 6 GB of the SD card is used to back the in-memory filesystem:
 
@@ -257,3 +257,67 @@ It is not a concern that we will run out of ramdisk space, because 6 GB of the S
 	rootfs          5.8G  350M  5.4G   6% /
 
 See? We have plenty of space. The backing partition is mounted as swap memory so state is not retained after power cycle.
+
+
+#### Prepare docker image archive
+
+We first need to find a `Dockerfile` that supports our `arm32v7` architecture. Although loading and running the docker images do not require Internet, this one-time step of preparing a docker image archive requires your node to have Internet connectivity.
+
+In this example, we will run [ipfs](https://github.com/ipfs/go-ipfs) using the [Dockerfile from vanmesh/p2p-apps-dockers](https://github.com/vanmesh/p2p-apps-dockers/blob/master/go-ipfs/Dockerfile):
+
+	root@christie:~# docker build -t tomeshnet/ipfs:0.1 https://raw.githubusercontent.com/vanmesh/p2p-apps-dockers/master/go-ipfs/Dockerfile
+	root@christie:~# docker save --output tomeshnet-ipfs-0.1.tar tomeshnet/ipfs:0.1
+
+Now we have a tar archive of the docker image called `tomeshnet-ipfs-0.1.tar`. Copy the docker image archive to your computer, then put it in `conf.d/docker/` on the SD card root of each node you are preparing. For example, on Mac OS:
+
+	$ mkdir /Volumes/BOOT/conf.d/docker
+	$ cp tomeshnet-ipfs-0.1.tar /Volumes/BOOT/conf.d/docker/
+
+This `docker` folder will be copied to the user home when the node starts.
+
+
+#### Load and run docker image
+
+If the node with hostname `bloor` is set up such that `conf.d/docker/` contains `tomeshnet-ipfs-0.1.tar`, you can do this upon boot to load and run the `tomeshnet/ipfs:0.1` docker image without the need for Internet access:
+
+	root@bloor:~# docker load --input ~/docker/tomeshnet-ipfs-0.1.tar
+	root@bloor:~# docker run --name ipfs --detach tomeshnet/ipfs:0.1
+
+You can find the image `tomeshnet/ipfs:0.1` with `docker images`, and the running container `ipfs` with `docker ps`.
+
+The ipfs container in this example runs an ipfs-to-http gateway that can be accessed from clients connected to the Access Point of the Raspberry Pi. First you need to find the container's local IP address from the results of `docker inspect ipfs`, then you can use this URL to access IPFS content from the client browser:
+
+	http://<ipfs-container-ip-address>:8080/ipfs/<ipfs-content-hash>
+
+From my laptop browser, http://172.17.0.2:8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme fetches the ipfs welcome page that looks like this:
+
+	Hello and Welcome to IPFS!
+
+	██╗██████╗ ███████╗███████╗
+	██║██╔══██╗██╔════╝██╔════╝
+	██║██████╔╝█████╗  ███████╗
+	██║██╔═══╝ ██╔══╝  ╚════██║
+	██║██║     ██║     ███████║
+	╚═╝╚═╝     ╚═╝     ╚══════╝
+
+	If you're seeing this, you have successfully installed
+	IPFS and are now interfacing with the ipfs merkledag!
+
+	 -------------------------------------------------------
+	| Warning:                                              |
+	|   This is alpha software. Use at your own discretion! |
+	|   Much is missing or lacking polish. There are bugs.  |
+	|   Not yet secure. Read the security notes for more.   |
+	 -------------------------------------------------------
+
+	Check out some of the other files in this directory:
+
+	  ./about
+	  ./help
+	  ./quick-start     <-- usage examples
+	  ./readme          <-- this file
+	  ./security-notes
+
+To recap in this example, we started an ipfs daemon and ipfs-to-http gateway in a docker container, so we have an ipfs node running on the Raspberry Pi that publishes and fetches content within our local mesh network. Through the http gateway, devices connected to the Raspberry Pi's Access Point can use a browser to fetch content published by any node in our mesh network.
+
+This is only one example of an application you can run in a docker container. You can follow similar steps to prepare another appication and load them on all your nodes.
