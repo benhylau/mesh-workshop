@@ -304,43 +304,53 @@ This `docker` folder will be copied to the user home when the node starts.
 If the node with hostname `bloor` is set up such that `conf.d/docker/` contains `tomeshnet-ipfs-0.1.tar`, you can do this upon boot to load and run the `tomeshnet/ipfs:0.1` docker image without the need for Internet access:
 
 	root@bloor:~# docker load --input ~/docker/tomeshnet-ipfs-0.1.tar
-	root@bloor:~# docker run --name ipfs --detach tomeshnet/ipfs:0.1
-
-You can find the image `tomeshnet/ipfs:0.1` with `docker images`, and the running container `ipfs` with `docker ps`.
-
-The ipfs container in this example runs an ipfs-to-http gateway that can be accessed from clients connected to the Access Point of the Raspberry Pi. First you need to find the container's local IP address from the results of `docker inspect ipfs`, then you can use this URL to access IPFS content from the client browser:
-
-	http://<ipfs-container-ip-address>:8080/ipfs/<ipfs-content-hash>
-
-From my laptop browser, http://172.17.0.2:8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme fetches the ipfs welcome page that looks like this:
-
-	Hello and Welcome to IPFS!
-
-	██╗██████╗ ███████╗███████╗
-	██║██╔══██╗██╔════╝██╔════╝
-	██║██████╔╝█████╗  ███████╗
-	██║██╔═══╝ ██╔══╝  ╚════██║
-	██║██║     ██║     ███████║
-	╚═╝╚═╝     ╚═╝     ╚══════╝
-
-	If you're seeing this, you have successfully installed
-	IPFS and are now interfacing with the ipfs merkledag!
-
-	 -------------------------------------------------------
-	| Warning:                                              |
-	|   This is alpha software. Use at your own discretion! |
-	|   Much is missing or lacking polish. There are bugs.  |
-	|   Not yet secure. Read the security notes for more.   |
-	 -------------------------------------------------------
-
-	Check out some of the other files in this directory:
-
-	  ./about
-	  ./help
-	  ./quick-start     <-- usage examples
-	  ./readme          <-- this file
-	  ./security-notes
-
-To recap in this example, we started an ipfs daemon and ipfs-to-http gateway in a docker container, so we have an ipfs node running on the Raspberry Pi that publishes and fetches content within our local mesh network. Through the http gateway, devices connected to the Raspberry Pi's Access Point can use a browser to fetch content published by any node in our mesh network.
+	root@bloor:~# docker run --name ipfs --network host --detach tomeshnet/ipfs:0.1
 
 This is only one example of an application you can run in a docker container. You can follow similar steps to prepare another appication and load them on all your nodes.
+
+
+#### Share content with the ipfs docker container
+
+After starting the `ipfs` docker container in detached mode, you can find information about it with `docker ps` and `docker inspect ipfs`. Now start a user session in the container:
+
+	root@bloor:~# docker exec -it ipfs sh
+
+From the session, you can interact with the ipfs node. For example, create a text file with the text _Hello World_ and add that to the ipfs node, then read it back by finding the content by its `<ipfs-content-hash>`:
+
+	/ # echo Hello World | ipfs add
+	/ # ipfs cat QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u
+
+The container runs an ipfs-to-http gateway that can be accessed from clients connected to the Access Point of the Raspberry Pi. You can use a URL formatted like this to access ipfs content from the client browser:
+
+	http://<hostname>.local:8080/ipfs/<ipfs-content-hash>
+
+For example, http://bloor.local:8080/ipfs/QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u fetches the _Hello World_ text.
+
+Now if you want to share content with other nodes, your ipfs node needs to be peered with other ipfs nodes to form an ipfs network. To do that, find out your ipfs node addresses on the mesh network:
+
+	/ # ipfs id
+	{
+	        "ID": "QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	        "PublicKey": "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6iZpl77PGvs2IImHtwmUxlJBKsDWcTFiNP1JfOep8l3MjnBkdhr/IPjjCv0xREodA11GHrL4xsq4SyPI0waR2V9/GVb8TQZQ9GkcujciSogAyJ23FcZrf06fo2pk2RvtSdJM0ox7ejLNBp2zTU3A1bgvLMipue0TKBwoZqfsyzXtA9se+9j+rXorDNGxHsQh+++XlQd082MBjXKtVH1qNoDZLrPzXIFLdB0jgBv1zkaUDvh+kFYnHORCKnkuBVhryo84zKzxBlA8WVSeILb4j71tvo2FBxIBEb0tr1cjE7DdrA/92lnwMgC4yfyXJMBwqTcXwPPybHMXwfViP27cvAgMBAAE=",
+	        "Addresses": [
+	                "/ip4/127.0.0.1/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip4/10.0.0.1/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip4/169.254.247.160/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip4/10.0.1.3/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip4/172.17.0.1/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip6/::1/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip6/fd00:338a:9ae7:1947:8a2b:7ea3:5c2d:f737/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq",
+	                "/ip6/fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq"
+	        ],
+	        "AgentVersion": "go-ipfs/0.4.13/cc01b7f18",
+	        "ProtocolVersion": "ipfs/0.1.0"
+	}
+
+Note the cjdns `/ip6/fc00::/8` and yggdrasil `/ip6/fd00::/8` addresses and share them with another node (e.g. `college`) so it can add you as a bootstrap peer from its docker user session:
+
+	/ # ipfs bootstrap add /ip6/fcb0:3f14:ebc8:1f7b:a1ce:bd44:a410:5049/tcp/4001/ipfs/QmXLWSa1AbLJfivfT9dQJdvs6AsdMkjZjjBMv5SVtimVBq
+
+Notice that the ipfs node address is in the format `/ip6/<mesh-node-ip-address>/tcp/4001/ipfs/<ipfs-node-id>`. Now an ipfs network is formed between `bloor` and `college`. Try publishing content on one node and fetching it from another.
+
+To recap in this example, we started an ipfs daemon and ipfs-to-http gateway in a docker container, then peered two nodes to create an ipfs content-addressing network. Each mesh node is now also an ipfs node that publishes and fetches content within our local mesh network. Through the http gateway, devices connected to the Raspberry Pi's Access Point can use a browser to fetch content published by any node that has at least one peer in this ipfs network.
+
