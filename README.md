@@ -201,17 +201,18 @@ If `bloor` is listening, `college` can send a plaintext message with:
 
 	root@college:~# nc bloor.local 80
 
-You can also run a minimal webserver that can respond to HTTP messages sent via `curl`:
+You can also run a minimal webserver that can respond to HTTP messages. Look at the script `start-webserver.sh` and run it:
 
-	root@bloor:~# while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; echo -e "You have reached $(cat /etc/hostname) on $(date)"; } | nc -l -p 80; done
+	root@bloor:~# cat ~/scripts/start-webserver.sh
+	root@bloor:~# sh ~/scripts/start-webserver.sh
 
 Then on `college`:
 
 	root@college:~# curl bloor.local
 
-Observe the response from the webserver. When you are ready to move on, `bloor` can stop the webserver with `Ctrl + Z` followed by:
+Observe the response from the webserver. When you are ready to move on, `bloor` can stop the webserver with `Ctrl + Z` then:
 
-    root@bloor:~# ps aux | grep '[nc] -l -p 80' | awk '{ print $2 }' | xargs -n 1 kill -9
+	root@bloor:~# sh ~/scripts/kill-webserver.sh
 
 
 ### 8. Make wired ethernet link and assign route with `ip`
@@ -287,8 +288,8 @@ In this example, we will run [ipfs](https://github.com/ipfs/go-ipfs) using the [
 
 Now we have a tar archive of the docker image called `tomeshnet-ipfs-0.1.tar`. Copy the docker image archive to your computer, then put it in `conf.d/docker/` on the SD card root of each node you are preparing. For example, on Mac OS:
 
-	$ mkdir /Volumes/BOOT/conf.d/docker
-	$ cp tomeshnet-ipfs-0.1.tar /Volumes/BOOT/conf.d/docker/
+	$ mkdir /Volumes/BOOT/conf.d/home/docker
+	$ cp tomeshnet-ipfs-0.1.tar /Volumes/BOOT/conf.d/home/docker/
 
 This `docker` folder will be copied to the user home when the node starts.
 
