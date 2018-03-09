@@ -223,17 +223,9 @@ Connect an ethernet cable between `bloor` and `college`, run `networkctl` on eac
 	  1 lo               loopback           carrier     unmanaged
 	  2 eth0             ether              degraded    configuring
 
-That's because it has no IP address assigned to it, but we can manually assign `192.168.0.1` to the interface on `bloor`:
+That's because it has no IP address assigned to it, so we need to manually assign `192.168.0.1` to the interface and tell `bloor` to route all `192.168.0.0/24` subnet traffic through it:
 
-	root@bloor:~# ip addr add 192.168.0.1 dev eth0
-
-You will now see `networkctl` show it as `routable`. Now assign `192.168.0.2` to the `eth0` interface on `college`:
-
-	root@college:~# ip addr add 192.168.0.2 dev eth0
-
-You are still unable to ping `192.168.0.2` from `192.168.0.1` until you add a route that tells your node to pass traffic destined for the `192.168.0.0/24` subnet to the `eth0` interface with IP address `192.168.0.1`:
-
-	root@bloor:~# ip route add 192.168.0.0/24 via 192.168.0.1
+	root@bloor:~# ip addr add 192.168.0.1/24 dev eth0
 
 Now you may list your routes with `ip route` and see the new static route:
 
@@ -243,11 +235,11 @@ Now you may list your routes with `ip route` and see the new static route:
 	10.0.1.0/24 dev wlan0 proto kernel scope link src 10.0.1.3
 	169.254.0.0/16 dev wlan0 proto kernel scope link src 169.254.227.187
 	172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
-	192.168.0.0/24 via 192.168.0.1 dev eth0
+	192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.1
 
-Similarly on `college`, add route and ping:
+You will now see `networkctl` show it as `routable`. Now assign `192.168.0.2` to the `eth0` interface on `college` and ping:
 
-	root@college:~# ip route add 192.168.0.0/24 via 192.168.0.2
+	root@college:~# ip addr add 192.168.0.2/24 dev eth0
 	root@college:~# ping 192.168.0.1
 
 Now you can iperf3 across the new wired link and observe close to 100 Mbps bandwidth because the Raspberry Pi 3 supports a 10/100 Mbps ethernet interface.
