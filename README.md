@@ -237,7 +237,7 @@ Now you may list your routes with `ip route` and see the new static route:
 	172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
 	192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.1
 
-You will now see `networkctl` show it as `routable`. Now assign `192.168.0.2` to the `eth0` interface on `college` and ping:
+You will now see `networkctl` show it as `routable`. Now assign `192.168.0.2/24` to the `eth0` interface on `college` and ping `bloor`:
 
 	root@college:~# ip addr add 192.168.0.2/24 dev eth0
 	root@college:~# ping 192.168.0.1
