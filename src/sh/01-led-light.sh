@@ -11,9 +11,7 @@ echo 1 > /sys/class/leds/led1/brightness
 echo 1 > /sys/class/leds/led0/brightness
 exit 0 
 EOF
-
 chmod +x /usr/local/bin/bootedled
-
 
 cat <<"EOF"> /lib/systemd/system/bootedled.service
 [Unit]
@@ -30,6 +28,6 @@ RestartSec=10s
 [Install]
 WantedBy=multi-user.target
 EOF
- 
+
 systemctl daemon-reload
 systemctl enable bootedled.service
