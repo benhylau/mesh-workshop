@@ -1,15 +1,35 @@
 #!/bin/sh
 echo LED Indicator
-mount >> /var/log/test1
 mount -t sysfs sysfs /sys
-ls /sys/class  >>/var/log/test1
-ls /sys/class/led  >>/var/log/test1
 echo heartbeat > /sys/class/leds/led1/trigger 
 echo none > /sys/class/leds/led0/trigger
 echo 0 > /sys/class/leds/led0/brightness
-echo '#!/bin/sh' > /etc/rc.local
-echo "echo 1 > /sys/class/leds/led1/brightness" >> /etc/rc.local
-echo "echo 1 > /sys/class/leds/led0/brightness" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local
-chmod +x /etc/rc.local
 
+cat <<"EOF"> /usr/local/bin/bootedled
+#!/bin/sh
+echo 1 > /sys/class/leds/led1/brightness 
+echo 1 > /sys/class/leds/led0/brightness
+exit 0 
+EOF
+
+chmod +x /usr/local/bin/bootedled
+
+
+cat <<"EOF"> /lib/systemd/system/bootedled.service
+[Unit]
+Description=LED Boot
+Wants=multi-user.target
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/local/bin/bootedled
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+ 
+systemctl daemon-reload
+systemctl enable bootedled.service
