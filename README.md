@@ -37,7 +37,7 @@ Now you can clone this repository and run `./build` to generate 40 unique host c
 
 Once you have both the mesh-orange image and per-node host configurations, simply flash the downloaded image onto an SD card with a tool like [Etcher](https://etcher.io), mount its FAT partition to your computer, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root. For example, on Mac OS:
 
-	$ cp output/conf.d/bloor/* /Volumes/BOOT/conf.d/
+	$ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
 
 Now you have configured the node with hostname `bloor`.
 
@@ -210,9 +210,7 @@ Then on `college`:
 
 	root@college:~# curl bloor.local
 
-Observe the response from the webserver. When you are ready to move on, `bloor` can stop the webserver with `Ctrl + Z` then:
-
-	root@bloor:~# sh ~/scripts/kill-webserver.sh
+Observe the response from the webserver. When you are ready to move on, hit `Ctrl + C` to stop the server.
 
 
 ### 8. Make wired ethernet link and assign route with `ip`
