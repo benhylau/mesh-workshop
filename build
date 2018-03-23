@@ -14,7 +14,7 @@ hostno=0
 for hostname in "${HOSTNAMES[@]}"; do
   ((hostno++))
 
-  mkdir -p output/conf.d/$hostname output/etc/$hostname
+  mkdir -p output/conf.d/$hostname/home output/etc/$hostname
 
   # Create 30-mesh-workshop.tar.gz that will be extracted into /etc
   cp -r src/etc/* output/etc/$hostname/
@@ -24,4 +24,7 @@ for hostname in "${HOSTNAMES[@]}"; do
 
   # Copy sh scripts
   cp src/sh/* output/conf.d/$hostname/
+
+  # Copy home directory
+  cp -r src/home/* output/conf.d/$hostname/home/
 done
