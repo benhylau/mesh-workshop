@@ -18,7 +18,7 @@ Hardware
 Each node consists of one:
 
 * Raspberry Pi 3
-* [USB WiFi adapter](https://github.com/phillymesh/802.11s-adapters/blob/master/README.md) with `ath9k_htc`, `rt2800usb`, or `rtl8192cu` driver
+* [USB WiFi adapter](https://github.com/phillymesh/802.11s-adapters/blob/master/README.md) with `rt2800usb`, `ath9k_htc`, or `rtl8192cu` driver
 * SD card with 8 GB or more space
 
 Other accessories:
@@ -26,6 +26,8 @@ Other accessories:
 * Power supply for Raspberry Pi 3
 * Ethernet cables
 * A network switch may come in handy
+
+_You may optionally use a Raspberry Pi 2 instead of a Raspberry Pi 3. In that case, you should have one `rt2800usb` adapter (for mesh point) and one `ath9k_htc` or `rtl8192cu` adapter (for access point). The configuration scripts will by default detect Raspberry Pi 2 hardware and configure these interfaces as described._
 
 
 Software
@@ -44,6 +46,8 @@ Now you have configured the node with hostname `bloor`.
 
 What does it do?
 ----------------
+
+Power on the Raspberry Pi 3 and wait for a solid green LED with a flashing red LED. Now your node is ready.
 
 ### 1. Connect to Access Point
 

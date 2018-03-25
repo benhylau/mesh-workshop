@@ -2,7 +2,7 @@
 # TODO - wire up a script to set that up
 [Match]
 Type=wlan
-Driver=ath9k_htc rt2800usb rtl8192cu
+Driver=rt2800usb ath9k_htc rtl8192cu
 
 [Network]
 LinkLocalAddressing=yes
