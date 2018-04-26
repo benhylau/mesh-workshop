@@ -33,15 +33,19 @@ _You may optionally use a Raspberry Pi 2 instead of a Raspberry Pi 3. In that ca
 Software
 --------
 
-You need a recent release of [mesh-orange](https://github.com/tomeshnet/mesh-orange) built using [mesh-router-builder](https://github.com/benhylau/mesh-router-builder), where the [cjdns](https://github.com/cjdelisle/cjdns) and [yggdrasil](https://github.com/Arceliar/yggdrasil-go/) mesh routers are pre-installed along with other tools required for this workshop. You can download from [**mesh-router-builder/releases**](https://github.com/benhylau/mesh-router-builder/releases) a recent `raspberrypi3-<version>.img`.
+1. From [**Releases**](https://github.com/benhylau/mesh-workshop/releases), download `raspberrypi3-<version>_mesh-workshop.img`, then flash the image onto an SD card with a tool like [Etcher](https://etcher.io).
 
-Now you can clone this repository and run `./build` to generate 40 unique host configurations under `output/`, or download the ones I built from [**mesh-workshop/releases**](https://github.com/benhylau/mesh-workshop/releases). The 40 configurations are packaged as `confd-<version>.tar.gz` and `confd-<version>.zip`, so you just need to extract the archives to find all of them.
+    >This image is a custom flavour of [mesh-orange](https://github.com/tomeshnet/mesh-orange) built using [mesh-router-builder](https://github.com/benhylau/mesh-router-builder) with the `mesh-workshop` profile, where the [cjdns](https://github.com/cjdelisle/cjdns) and [yggdrasil](https://github.com/Arceliar/yggdrasil-go/) mesh routers are pre-installed along with other tools required for this workshop.
 
-Once you have both the mesh-orange image and per-node host configurations, simply flash the downloaded image onto an SD card with a tool like [Etcher](https://etcher.io), mount its FAT partition to your computer, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root. For example, on Mac OS:
+2. From the same [**Releases**](https://github.com/benhylau/mesh-workshop/releases) page, download one of `confd-<version>.tar.gz` and `confd-<version>.zip`, which are archives containing the 40 unique host configurations. Mount the FAT partition of the SD card you flashed in the previous step, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root.
 
-	$ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
+    For example, on Mac OS:
 
-Now you have configured the node with hostname `bloor`.
+	    $ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
+
+    Now you have configured the node with hostname `bloor`.
+
+    >If you wish to build these per-node host configurations yourself, clone this repository and run `./build` to generate 40 unique host configurations under `output/`.
 
 
 What does it do?
