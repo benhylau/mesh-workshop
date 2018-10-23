@@ -2,7 +2,7 @@ Mesh Workshop
 =============
 
 [![Generic badge](https://img.shields.io/badge/Workshop_time-2_hours-1f73e0.svg)](https://github.com/benhylau/mesh-workshop)
-[![Generic badge](https://img.shields.io/badge/Martix_chat-%23tomesh:tomesh.net-666666.svg)](https://chat.tomesh.net/#/room/#tomesh:tomesh.net)
+[![Generic badge](https://img.shields.io/badge/Matrix_chat-%23tomesh:tomesh.net-666666.svg)](https://chat.tomesh.net/#/room/#tomesh:tomesh.net)
 [![Generic badge](https://img.shields.io/badge/IRC-freenode%2F%23tomesh-666666.svg)](https://webchat.freenode.net/?channels=tomesh)
 
 This repository describes nodes used to facilitate workshops and demos for mesh networking. The nodes boot with multiple zero-configuration technologies such as mDNS and self-addressing auto-peering mesh protocols to eliminate initial set up time. An autonomous network is formed upon power-on and nodes can address each other over `<hostname>.local` addresses.
