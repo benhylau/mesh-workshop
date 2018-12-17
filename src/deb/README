@@ -1,0 +1,56 @@
+# To generate this list of .deb packages, these commands need to be run in an
+# Internet-connected workshop node with an empty local deb directory
+
+# TODO: This process should be moved to CI, but the commands currently need
+# to be run from armhf architecture and in the mesh-orange environment, the
+# same is true for docker containers, final artifacts should be in release
+# artifacts and not committed to git
+
+# Make directory to keep the downloaded .deb packages
+mkdir ~/deb
+
+# Download general packages needed for workshop
+apt update
+apt clean
+apt install --allow-unauthenticated --download-only --yes \
+  avahi-daemon \
+  bwm-ng \
+  ca-certificates \
+  curl \
+  iperf3 \
+  iputils-ping \
+  libnss-mdns \
+  nano-tiny \
+  netcat
+cp /var/cache/apt/archives/*.deb deb/
+
+# Download packages that will become installed in the next step, but we need
+# their .deb packages, so we download them first
+apt clean
+apt install --allow-unauthenticated --download-only --yes \
+  libcurl3-gnutls \
+  libltdl7
+cp /var/cache/apt/archives/*.deb deb/
+
+# Download docker from its own debian source
+apt install --allow-unauthenticated --yes \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  gnupg2 \
+  software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+echo "deb [arch=armhf] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | \
+  tee /etc/apt/sources.list.d/docker.list
+apt update
+apt clean
+apt install --allow-unauthenticated --download-only --yes docker-ce
+cp /var/cache/apt/archives/*.deb deb/
+
+# Download mesh router packages
+(cd deb && curl --location --remote-name https://github.com/benhylau/mesh-router-builder/releases/download/v0.10/cjdns_20.2-0.10_armhf.deb)
+(cd deb && curl --location --remote-name https://github.com/benhylau/mesh-router-builder/releases/download/v0.10/yggdrasil-go_0.3.0-0.10_armhf.deb)
+
+# If packages are missing dependencies this command could be helpful
+#apt install --download-only --fix-broken --yes
