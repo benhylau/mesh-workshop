@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Tool to configure mesh-workshop node
+#
+
+set -e
+
+confpath=$1
+nodename=$2
+
+HOSTNAMES=(bathurst bayview bloor broadview chester christie college coxwell davisville donlands dufferin dundas dupont eglinton ellesmere finch greenwood islington jane keele kennedy king kipling lawrence leslie midland museum osgoode ossington pape queen rosedale runnymede spadina summerhill union warden wilson woodbine yorkdale)
+
+# Check required inputs
+if [ "$confpath" == '' ] || [ "$nodename" == '' ]; then
+  echo 'Usage:   mesh-workshop confpath nodename'
+  echo 'Example: mesh-workshop /Volumes/BOOT/conf.d/ bloor'
+  exit 1
+fi
+
+# Make sure the path to conf.d contains conf.d
+echo "$confpath" | grep -E 'conf.d/?$' 1>/dev/null
+ret=$?
+if [ $ret != 0 ]; then
+    echo 'The path to conf.d must end with conf.d'
+    exit 1
+fi
+
+# Make sure the node name is valid
+ret=1
+for hostname in "${HOSTNAMES[@]}"; do
+  if [ "$hostname" == "$nodename" ]; then
+    ret=0
+    break
+  fi
+done
+if [ $ret != 0 ]; then
+  echo "Node name must match one of:"
+  echo "${HOSTNAMES[@]}"
+  exit 1
+fi
+
+# Install files on node
+cp -r shared/conf.d/* "$confpath"
+cp -r custom/conf.d/$nodename/*.tar.gz "$confpath"
+echo "Installed node profile $nodename to $confpath"

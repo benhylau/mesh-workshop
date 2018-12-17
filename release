@@ -3,7 +3,7 @@
 # Package assets for release
 #
 
-RELEASE_VERSION=0.3
+RELEASE_VERSION=0.4
 
 ./build
 
@@ -12,5 +12,5 @@ rm -rf publish
 mkdir publish
 
 # Package assets in tar.gz and zip formats
-tar --create --gzip -f "publish/confd-${RELEASE_VERSION}.tar.gz" -C output conf.d
-cd output; zip --recurse-paths "../publish/confd-${RELEASE_VERSION}.zip" conf.d; cd ..
+tar --create --gzip -f "publish/mesh-workshop-${RELEASE_VERSION}.tar.gz" -C output .
+cd output; zip --recurse-paths "../publish/mesh-workshop-${RELEASE_VERSION}.zip" .; cd ..
