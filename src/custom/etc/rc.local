@@ -2,6 +2,8 @@
 
 # Install local debian packages
 sh /root/scripts/install-packages.sh
+
+# Start system services
 sh /root/scripts/start-services.sh
 
 exit 0
