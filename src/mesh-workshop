@@ -3,6 +3,8 @@
 # Tool to configure mesh-workshop node
 #
 
+set -e
+
 confpath=$1
 nodename=$2
 
