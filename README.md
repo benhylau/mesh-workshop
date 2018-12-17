@@ -33,19 +33,15 @@ _You may optionally use a Raspberry Pi 2 instead of a Raspberry Pi 3. In that ca
 Software
 --------
 
-1. From [**Releases**](https://github.com/benhylau/mesh-workshop/releases), download `raspberrypi3-<version>_mesh-workshop.img`, then flash the image onto an SD card with a tool like [Etcher](https://etcher.io).
+1. Download the [latest mesh-orange release](https://github.com/benhylau/mesh-router-builder/releases/latest) of `raspberrypi3-<version>_default.img`, then flash the image onto an SD card with a tool like [Etcher](https://etcher.io).
 
-    >This image is a custom flavour of [mesh-orange](https://github.com/tomeshnet/mesh-orange) built using [mesh-router-builder](https://github.com/benhylau/mesh-router-builder) with the `mesh-workshop` profile, where the [cjdns](https://github.com/cjdelisle/cjdns) and [yggdrasil](https://github.com/Arceliar/yggdrasil-go/) mesh routers are pre-installed along with other tools required for this workshop.
+2. Download the [latest mesh-workshop release](https://github.com/benhylau/mesh-workshop/releases/latest) and unpack it. Mount the FAT partition of the SD card you flashed in the previous step, then use the tool `mesh-workshop` to install workshop files on each node:
 
-2. From the same [**Releases**](https://github.com/benhylau/mesh-workshop/releases) page, download one of `confd-<version>.tar.gz` and `confd-<version>.zip`, which are archives containing the 40 unique host configurations. Mount the FAT partition of the SD card you flashed in the previous step, then copy from `output/conf.d/<hostname>/*` to the `conf.d/` on the SD card root.
+		$ ./mesh-workshop
+		Usage:   mesh-workshop confpath nodename
+		Example: mesh-workshop /Volumes/BOOT/conf.d/ bloor
 
-    For example, on Mac OS:
-
-	    $ cp -r output/conf.d/bloor/* /Volumes/BOOT/conf.d/
-
-    Now you have configured the node with hostname `bloor`.
-
-    >If you wish to build these per-node host configurations yourself, clone this repository and run `./build` to generate 40 unique host configurations under `output/`.
+	The example shows a path to your SD card on Mac OS, your local path may differ. The command installs node profile and workshop files to the SD card `conf.d` for the node with hostname `bloor`.
 
 
 What does it do?
