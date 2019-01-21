@@ -20,6 +20,7 @@ apt install --allow-unauthenticated --download-only --yes \
   haveged \
   iperf3 \
   iputils-ping \
+  libmojolicious-perl \
   libnss-mdns \
   nano-tiny \
   netcat
@@ -52,6 +53,10 @@ cp /var/cache/apt/archives/*.deb deb/
 # Download mesh router packages
 (cd deb && curl --location --remote-name https://github.com/benhylau/mesh-router-builder/releases/download/v0.10/cjdns_20.2-0.10_armhf.deb)
 (cd deb && curl --location --remote-name https://github.com/benhylau/mesh-router-builder/releases/download/v0.10/yggdrasil-go_0.3.0-0.10_armhf.deb)
+
+# Download custom packages
+# TODO: Download cjdnstool from https://github.com/hamishcoleman/cjdns_tool
+(cd deb && curl --location --remote-name https://github.com/stigtsp/cjdns-hello/releases/download/0.1.1/cjdns-hello_0.1.1-0-g662e2a5_all.deb)
 
 # If packages are missing dependencies this command could be helpful
 #apt install --download-only --fix-broken --yes
