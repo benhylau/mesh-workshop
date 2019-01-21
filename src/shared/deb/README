@@ -17,6 +17,7 @@ apt install --allow-unauthenticated --download-only --yes \
   bwm-ng \
   ca-certificates \
   curl \
+  haveged \
   iperf3 \
   iputils-ping \
   libnss-mdns \
